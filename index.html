@@ -3,287 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1.0">
-<title>🚆 さくら線 運転シミュレーター v3</title>
+<title>さくらライン運転シミュレーター</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:'Noto Sans JP',sans-serif;touch-action:manipulation}
+html,body{width:100%;height:100%;overflow:hidden;background:#05070b;color:#fff;font-family:'Noto Sans JP',sans-serif;touch-action:manipulation}
+button,input{font:inherit}
 .screen{display:none;position:fixed;inset:0;z-index:1}
 .screen.active{display:flex}
-.menu-btn{font-family:'Noto Sans JP',sans-serif;font-size:1rem;font-weight:700;padding:11px 36px;border:2px solid rgba(255,255,255,0.3);border-radius:50px;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;transition:all .3s;min-width:220px;-webkit-tap-highlight-color:transparent}
-.menu-btn:hover,.menu-btn:active{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.6);transform:scale(1.04)}
-
-/* Title */
-#title-screen{flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0a2e,#1a1a4e,#2a1a3e)}
-.title-content{text-align:center;z-index:2}
-.title-sub{display:block;font-family:'Orbitron',sans-serif;font-size:1rem;color:#88ccff;letter-spacing:5px;margin-bottom:4px}
-.title-main{display:block;font-size:3rem;font-weight:900;background:linear-gradient(180deg,#fff,#ffb7d5,#ff6b9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 16px rgba(255,107,157,0.5));margin-bottom:4px}
-.title-edition{display:block;font-size:1.1rem;color:#aaddff;letter-spacing:3px;margin-bottom:30px}
-.title-menu{display:flex;flex-direction:column;gap:12px;align-items:center;margin-bottom:20px}
-.title-info{color:rgba(255,255,255,0.35);font-size:.75rem}
-
-/* Select */
-#select-screen{flex-direction:column;align-items:center;justify-content:flex-start;background:linear-gradient(135deg,#0a1a2e,#1a2a4e,#0a2a3e);overflow-y:auto;padding:20px 16px}
-.select-content{max-width:700px;width:100%;text-align:center}
-.select-content h2{font-size:1.5rem;margin-bottom:14px}
-.section-label{font-size:.85rem;color:#88ccff;margin:14px 0 8px;text-align:left;font-weight:700}
-.route-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
-.route-card{background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;text-align:left}
-.route-card.selected{background:rgba(255,255,255,0.15);border-color:currentColor;box-shadow:0 0 15px rgba(255,255,255,0.1)}
-.route-name{font-size:1.1rem;font-weight:900;margin-bottom:2px}
-.route-diff{font-size:.75rem;margin-bottom:4px}
-.route-desc{font-size:.8rem;color:rgba(255,255,255,0.6);margin-bottom:4px}
-.route-info{font-size:.7rem;color:rgba(255,255,255,0.4);font-family:'Orbitron',sans-serif}
-.option-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-.weather-btn,.tod-btn{font-family:'Noto Sans JP',sans-serif;font-size:.8rem;padding:8px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;transition:all .2s;flex:1;min-width:70px;text-align:center}
-.weather-btn.selected,.tod-btn.selected{background:rgba(100,160,255,0.25);border-color:#88ccff}
-.select-buttons{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap}
-
-/* Tutorial */
-#tutorial-screen{flex-direction:column;align-items:center;justify-content:flex-start;background:linear-gradient(135deg,#0a2a0a,#1a3a1a,#0a2a2a);overflow-y:auto;padding:24px 16px}
-.tutorial-content{max-width:700px;text-align:center}
-.tutorial-content h2{font-size:1.5rem;margin-bottom:16px}
-.tutorial-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
-.tutorial-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 6px}
-.key-icon{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:#88ff88;background:rgba(0,0,0,0.4);border-radius:6px;padding:5px 8px;margin-bottom:4px;display:inline-block}
-.key-desc{font-size:.7rem;color:rgba(255,255,255,0.7);line-height:1.3}
-.tutorial-tips{text-align:left;background:rgba(255,255,255,0.04);border-radius:10px;padding:14px 18px;margin-bottom:16px}
-.tutorial-tips h3{margin-bottom:8px;color:#ffdd88;font-size:.9rem}
-.tutorial-tips li{padding:3px 0 3px 22px;position:relative;color:rgba(255,255,255,0.7);font-size:.8rem;list-style:none}
-.tutorial-tips li::before{content:'✅';position:absolute;left:0;font-size:.7rem}
-
-/* Ranking */
-#ranking-screen{flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a1a0a,#3a2a1a,#2a1a2a)}
-.ranking-content{max-width:520px;width:90%;text-align:center}
-.ranking-content h2{font-size:1.5rem;margin-bottom:16px}
-.ranking-list{background:rgba(0,0,0,0.4);border-radius:10px;padding:12px;margin-bottom:16px;max-height:350px;overflow-y:auto}
-.ranking-item{display:flex;align-items:center;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.08);gap:10px;font-size:.85rem}
-.ranking-item:last-child{border-bottom:none}
-.rank-number{font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:900;width:40px;text-align:center}
-.rank-1{color:#ffd700}.rank-2{color:#c0c0c0}.rank-3{color:#cd7f32}
-.rank-name{flex:1;text-align:left;font-weight:700}
-.rank-score{font-family:'Orbitron',sans-serif;font-weight:700;color:#88ccff;font-size:.8rem}
-.rank-grade{font-weight:900;width:28px;text-align:center}
-.loading{color:rgba(255,255,255,0.4);padding:16px;font-size:.85rem}
-
-/* Game */
-#game-screen{background:#000}
-#game-screen.active{display:block}
+.menu-btn{font-weight:800;font-size:1rem;padding:12px 28px;border:1px solid rgba(255,255,255,.28);border-radius:8px;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;min-width:210px;transition:.2s;-webkit-tap-highlight-color:transparent}
+.menu-btn:hover,.menu-btn:active{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.55);transform:translateY(-1px)}
+#title-screen{align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(6,16,30,.82),rgba(7,8,12,.96)),url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80') center/cover}
+.title-content{width:min(880px,92vw);padding:28px 0;text-align:left}
+.title-sub{display:block;font-family:'Orbitron',sans-serif;font-size:.9rem;color:#9bd8ff;letter-spacing:4px;margin-bottom:8px}
+.title-main{display:block;font-size:clamp(2.4rem,7vw,5.2rem);font-weight:900;line-height:1.02;text-shadow:0 8px 32px rgba(0,0,0,.6)}
+.title-edition{display:block;font-size:clamp(1rem,2.4vw,1.35rem);color:#ffd38a;margin:12px 0 34px;font-weight:700}
+.title-menu{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.title-info{max-width:720px;color:rgba(255,255,255,.76);line-height:1.7;font-size:.95rem}
+#select-screen,#tutorial-screen,#result-screen{flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:22px 14px;background:linear-gradient(135deg,#071524,#10263b,#10151c)}
+.select-content,.tutorial-content,.result-content{width:min(760px,100%);text-align:center}
+h2{font-size:1.55rem;margin-bottom:16px}
+.section-label{font-size:.9rem;color:#9bd8ff;margin:16px 0 8px;text-align:left;font-weight:800}
+.route-cards{display:grid;grid-template-columns:1fr;gap:10px}
+.route-card{background:rgba(255,255,255,.075);border:2px solid rgba(255,255,255,.16);border-radius:8px;padding:14px;text-align:left;cursor:pointer;transition:.2s}
+.route-card.selected{background:rgba(255,255,255,.16);box-shadow:0 0 0 2px rgba(255,255,255,.12) inset}
+.route-name{font-size:1.12rem;font-weight:900;margin-bottom:3px}
+.route-diff{font-size:.78rem;color:#ffd38a;margin-bottom:5px}
+.route-desc{font-size:.84rem;color:rgba(255,255,255,.72);line-height:1.45}
+.route-info{font-size:.74rem;color:rgba(255,255,255,.48);font-family:'Orbitron',sans-serif;margin-top:6px}
+.option-row{display:flex;gap:8px;flex-wrap:wrap}
+.weather-btn,.tod-btn{font-size:.86rem;padding:9px 12px;border:1px solid rgba(255,255,255,.22);border-radius:8px;background:rgba(255,255,255,.07);color:#fff;cursor:pointer;flex:1;min-width:86px}
+.weather-btn.selected,.tod-btn.selected{background:rgba(85,170,255,.25);border-color:#8fd4ff}
+.select-buttons,.result-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.tutorial-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.tutorial-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:12px 8px}
+.key-icon{font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:800;color:#9dffb7;background:rgba(0,0,0,.35);border-radius:6px;padding:5px 8px;margin-bottom:5px;display:inline-block}
+.key-desc{font-size:.74rem;color:rgba(255,255,255,.75);line-height:1.35}
+.tutorial-tips{text-align:left;background:rgba(255,255,255,.055);border-radius:8px;padding:14px 18px;margin-bottom:14px}
+.tutorial-tips h3{font-size:.95rem;color:#ffd38a;margin-bottom:8px}
+.tutorial-tips li{list-style:none;padding:4px 0;color:rgba(255,255,255,.78);font-size:.86rem}
+#game-screen{background:#000}.active#game-screen{display:block}
 #game-canvas{display:block;width:100%;height:100%}
-.guide-overlay{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:20;pointer-events:none}
-.guide-message{background:rgba(0,0,0,0.85);border:2px solid #88ff88;border-radius:8px;padding:8px 18px;font-size:.85rem;color:#88ff88;text-align:center;white-space:nowrap;opacity:0;transition:opacity .4s}
+.guide-overlay{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:20;pointer-events:none;max-width:92vw}
+.guide-message{background:rgba(0,0,0,.86);border:2px solid #83ff9d;border-radius:8px;padding:8px 14px;font-size:.85rem;color:#83ff9d;text-align:center;opacity:0;transition:.35s}
 .guide-message.visible{opacity:1}
-
-/* HUD */
-.hud{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:6px 10px;background:linear-gradient(transparent 0%,rgba(0,0,0,0.88) 35%);z-index:15;pointer-events:none}
-.hud-panel{background:rgba(10,20,40,0.9);border:1px solid rgba(100,160,255,0.25);border-radius:6px;padding:6px 10px;margin-bottom:3px}
-.hud-label{font-size:.6rem;color:rgba(255,255,255,0.45);letter-spacing:.5px;margin-bottom:1px}
-.hud-value{font-family:'Orbitron',sans-serif;font-weight:700}
+.hud{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:6px 10px;background:linear-gradient(transparent,rgba(0,0,0,.9) 38%);z-index:15;pointer-events:none;gap:8px}
+.hud-panel{background:rgba(8,18,32,.92);border:1px solid rgba(120,190,255,.26);border-radius:6px;padding:6px 9px;margin-bottom:3px}
+.hud-label{font-size:.62rem;color:rgba(255,255,255,.5);margin-bottom:1px}
+.hud-value{font-family:'Orbitron',sans-serif;font-weight:800}
 .hud-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
-.station-name{font-size:1.15rem;color:#88ddff}
-.distance{font-size:.9rem;color:#ffdd88}
-.time{font-size:.8rem;color:#aaffaa}
-.on-time{color:#88ff88}.delay-text{color:#ff8888}.early-text{color:#88bbff}
-.score{font-size:1rem;color:#ffdd44}
-.track-info{font-size:.7rem;color:rgba(255,255,255,0.5);font-family:'Orbitron',sans-serif}
-
-.hud-center{display:flex;flex-direction:column;align-items:center}
-.speedometer{position:relative;width:180px;height:180px}
-#speed-canvas{display:block}
-.speed-digital{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-.speed-number{font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;color:#fff;display:block;line-height:1}
-.speed-unit{font-size:.6rem;color:rgba(255,255,255,0.4)}
-.speed-limit-display{background:rgba(255,50,50,0.2);border:2px solid #ff4444;border-radius:6px;padding:2px 12px;text-align:center;margin-top:2px}
-.limit-label{font-size:.55rem;color:rgba(255,255,255,0.4);display:block}
-.limit-value{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:#ff6666}
-
-.lever-display{display:flex;gap:14px;justify-content:center}
-.lever-section{text-align:center;min-width:55px}
-.lever-indicator{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;padding:3px 0}
-.lever-indicator.mascon{color:#44ff88}
-.lever-indicator.brake{color:#ff6644}
-.lever-bar-container{width:24px;height:60px;background:rgba(255,255,255,0.08);border-radius:3px;margin:2px auto;position:relative;overflow:hidden}
-.lever-bar{position:absolute;bottom:0;left:0;width:100%;border-radius:3px;transition:height .15s}
-.mascon-bar{background:linear-gradient(to top,#22aa44,#88ff88)}
-.brake-bar{background:linear-gradient(to top,#cc3322,#ff8866)}
-.speed-warning{animation:flash-w .5s infinite}
-@keyframes flash-w{0%,100%{color:#fff}50%{color:#ff2222}}
-
-/* Passenger View Window */
-.passenger-view{position:fixed;top:8px;right:8px;z-index:18;background:rgba(0,0,0,0.8);border:2px solid rgba(100,160,255,0.5);border-radius:12px;overflow:hidden;width:420px;transition:all .3s;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
-.passenger-view.minimized{height:30px}
-.passenger-view.minimized #passenger-canvas{display:none}
-.pv-header{display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:rgba(20,40,80,0.95);font-size:.75rem;color:rgba(255,255,255,0.8);font-weight:700}
-.pv-title{letter-spacing:1px}
-.pv-toggle{background:none;border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:.75rem;padding:1px 8px;border-radius:4px;cursor:pointer;line-height:1.4}
-#passenger-canvas{display:block;width:100%;height:240px}
-@media (max-width:768px){.passenger-view{width:320px;top:4px;right:4px}#passenger-canvas{height:180px}}
-@media (max-width:480px){.passenger-view{width:240px}#passenger-canvas{height:140px}}
-
-/* Conductor Evaluation Overlay */
-.conductor-overlay{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);animation:fadeIn .3s}
-.conductor-overlay.active{display:flex}
-.conductor-card{background:linear-gradient(135deg,#1a2a4e,#0a1a3e);border:3px solid rgba(100,160,255,0.4);border-radius:20px;padding:28px 36px;max-width:560px;width:92%;text-align:center;box-shadow:0 0 40px rgba(50,120,255,0.3);animation:popIn .4s ease-out}
-@keyframes popIn{0%{transform:scale(0.7);opacity:0}100%{transform:scale(1);opacity:1}}
-@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-.conductor-avatar{font-size:4.5rem;margin-bottom:8px;display:block;filter:drop-shadow(0 0 12px rgba(255,255,255,0.3))}
-.conductor-name{font-size:.85rem;color:rgba(255,255,255,0.5);margin-bottom:10px}
-.conductor-speech{background:rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;margin-bottom:14px;position:relative;border:1px solid rgba(255,255,255,0.15)}
-.conductor-speech::after{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:10px solid rgba(255,255,255,0.08)}
-.conductor-msg{font-size:1.1rem;font-weight:700;line-height:1.6;color:#fff}
-.conductor-detail{font-size:.8rem;color:rgba(255,255,255,0.6);margin-top:8px}
-.conductor-grade{font-family:'Orbitron',sans-serif;font-size:3.5rem;font-weight:900;margin:10px 0;text-shadow:0 0 25px currentColor}
-.conductor-btn{font-family:'Noto Sans JP',sans-serif;font-size:.9rem;font-weight:700;padding:10px 32px;border:2px solid rgba(255,255,255,0.3);border-radius:50px;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;transition:all .3s;margin-top:8px}
-.conductor-btn:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.6)}
-
-/* Claim popup */
-.claim-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);z-index:45;background:rgba(200,30,30,0.95);border:3px solid #ff4444;border-radius:16px;padding:20px 32px;text-align:center;pointer-events:none;transition:transform .3s ease-out;box-shadow:0 0 30px rgba(255,0,0,0.4)}
-.claim-toast.show{transform:translate(-50%,-50%) scale(1)}
-.claim-toast .claim-icon{font-size:3rem;display:block;margin-bottom:6px}
-.claim-toast .claim-text{font-size:1.1rem;font-weight:900;color:#fff}
-.claim-toast .claim-sub{font-size:.8rem;color:rgba(255,200,200,0.8);margin-top:4px}
-
-/* Achievement overlay */
-.achievement-overlay{position:fixed;top:12%;right:12px;z-index:42;display:none;pointer-events:none;animation:achSlide .5s ease-out}
-.achievement-overlay.active{display:block}
-@keyframes achSlide{0%{transform:translateX(120%);opacity:0}100%{transform:translateX(0);opacity:1}}
-.achievement-card{background:linear-gradient(135deg,rgba(50,40,10,0.95),rgba(80,60,20,0.95));border:2px solid #ffd700;border-radius:14px;padding:14px 22px;text-align:center;box-shadow:0 0 25px rgba(255,200,0,0.3);min-width:180px}
-.achievement-icon{font-size:2.5rem;margin-bottom:4px}
-.achievement-name{font-size:.9rem;font-weight:900;color:#ffd700}
-.achievement-desc{font-size:.7rem;color:rgba(255,255,255,0.6);margin-top:2px}
-
-/* Mobile Touch Controls */
-.touch-controls{position:fixed;bottom:0;left:0;right:0;display:none;justify-content:space-around;align-items:flex-end;padding:6px 4px 8px;z-index:25;pointer-events:auto;background:linear-gradient(transparent,rgba(0,0,0,0.7) 20%)}
-.touch-btn{width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.12);color:#fff;font-size:.6rem;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;transition:background .15s}
-.touch-btn:active{background:rgba(255,255,255,0.35);transform:scale(1.08)}
-.touch-btn .touch-icon{font-size:1.2rem;line-height:1}
-.touch-btn.accel{border-color:rgba(68,255,136,0.5);color:#44ff88}
-.touch-btn.brake{border-color:rgba(255,102,68,0.5);color:#ff6644}
-.touch-btn.emergency{border-color:rgba(255,50,50,0.6);color:#ff3333;width:48px;height:48px;font-size:.55rem}
-@media (pointer:coarse),(max-width:900px){
-    .touch-controls{display:flex!important}
-    .hud{bottom:72px;padding:4px 6px}
-    .speedometer{width:130px;height:130px}
-    .speed-number{font-size:1.6rem}
-    .hud-panel{padding:4px 6px}
-    .lever-bar-container{height:40px}
-    .station-name{font-size:.95rem}
-    .tutorial-grid{grid-template-columns:repeat(2,1fr)}
-    .title-main{font-size:2.2rem}
-}
-
-/* Result */
-#result-screen{flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0a2e,#1a1a4e,#2a1a3e);overflow-y:auto;padding:16px}
-.result-content{text-align:center;max-width:520px;width:95%}
-.result-content h2{font-size:1.5rem;margin-bottom:8px}
-.result-rank{font-family:'Orbitron',sans-serif;font-size:4.5rem;font-weight:900;margin:8px 0;text-shadow:0 0 25px currentColor}
-.rank-S{color:#ffd700}.rank-A{color:#ff6b9d}.rank-B{color:#88ccff}.rank-C{color:#88ff88}.rank-D{color:#888}
-.result-details{background:rgba(0,0,0,0.4);border-radius:10px;padding:14px;margin-bottom:14px;text-align:left;max-height:220px;overflow-y:auto}
-.result-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:.8rem}
-.result-row:last-child{border-bottom:none}
-.result-label{color:rgba(255,255,255,0.65)}
-.result-value{font-family:'Orbitron',sans-serif;font-weight:700;color:#88ccff;font-size:.75rem}
-.result-form{margin-bottom:12px}
-.result-form input{font-family:'Noto Sans JP',sans-serif;font-size:.9rem;padding:9px 16px;border:2px solid rgba(255,255,255,0.3);border-radius:50px;background:rgba(255,255,255,0.1);color:#fff;width:100%;max-width:260px;margin-bottom:8px;text-align:center;outline:none}
-.result-form input::placeholder{color:rgba(255,255,255,0.25)}
-.result-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.station-name{font-size:1.1rem;color:#8fdcff}.distance{font-size:.9rem;color:#ffdc86}.time{font-size:.8rem;color:#a8ffb0}
+.on-time{color:#9dffb7}.delay-text{color:#ff8888}.early-text{color:#93c6ff}.score{font-size:1rem;color:#ffdf55}.track-info{font-size:.72rem;color:rgba(255,255,255,.62);font-family:'Orbitron',sans-serif}
+.hud-center{display:flex;flex-direction:column;align-items:center}.speedometer{position:relative;width:180px;height:180px}
+#speed-canvas{display:block}.speed-digital{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.speed-number{font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;line-height:1}.speed-unit{font-size:.6rem;color:rgba(255,255,255,.48)}
+.speed-limit-display{background:rgba(255,60,60,.18);border:2px solid #ff5555;border-radius:6px;padding:2px 12px;text-align:center;margin-top:2px}
+.limit-label{font-size:.55rem;color:rgba(255,255,255,.5);display:block}.limit-value{font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:900;color:#ff7777}
+.lever-display{display:flex;gap:12px;justify-content:center}.lever-section{text-align:center;min-width:52px}
+.lever-indicator{font-family:'Orbitron',sans-serif;font-size:1.08rem;font-weight:900;padding:3px 0}.mascon{color:#5cff91}.brake{color:#ff7b5c}
+.lever-bar-container{width:24px;height:58px;background:rgba(255,255,255,.09);border-radius:3px;margin:2px auto;position:relative;overflow:hidden}
+.lever-bar{position:absolute;bottom:0;left:0;width:100%;border-radius:3px;transition:height .15s}.mascon-bar{background:linear-gradient(to top,#23a64b,#8cffaa)}.brake-bar{background:linear-gradient(to top,#c63a2b,#ff9379)}
+.speed-warning{animation:flash-w .5s infinite}@keyframes flash-w{0%,100%{color:#fff}50%{color:#ff3333}}
+.passenger-view{position:fixed;top:8px;right:8px;z-index:18;background:rgba(0,0,0,.82);border:2px solid rgba(120,190,255,.5);border-radius:8px;overflow:hidden;width:380px;transition:.3s;box-shadow:0 4px 20px rgba(0,0,0,.55)}
+.passenger-view.minimized{height:30px}.passenger-view.minimized #passenger-canvas{display:none}
+.pv-header{display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:rgba(16,38,72,.96);font-size:.75rem;font-weight:800}.pv-toggle{background:none;border:1px solid rgba(255,255,255,.35);color:#fff;padding:1px 8px;border-radius:4px;cursor:pointer}
+#passenger-canvas{display:block;width:100%;height:220px}
+.conductor-overlay{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72)}.conductor-overlay.active{display:flex}
+.conductor-card{background:linear-gradient(135deg,#162c4c,#09182c);border:2px solid rgba(120,190,255,.45);border-radius:10px;padding:24px;max-width:540px;width:92%;text-align:center}
+.conductor-avatar{font-size:3.8rem;display:block}.conductor-name{font-size:.85rem;color:rgba(255,255,255,.58);margin:8px 0}.conductor-speech{background:rgba(255,255,255,.08);border-radius:8px;padding:14px;margin-bottom:10px}.conductor-msg{font-size:1rem;font-weight:800;line-height:1.6}.conductor-detail{font-size:.8rem;color:rgba(255,255,255,.68);margin-top:8px}.conductor-grade{font-family:'Orbitron',sans-serif;font-size:3rem;font-weight:900}.conductor-btn{margin-top:8px}
+.claim-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);z-index:45;background:rgba(190,30,30,.96);border:2px solid #ff5555;border-radius:10px;padding:18px 28px;text-align:center;pointer-events:none;transition:.25s}.claim-toast.show{transform:translate(-50%,-50%) scale(1)}.claim-icon{font-size:2.5rem;display:block}.claim-text{font-weight:900}.claim-sub{font-size:.82rem;color:rgba(255,225,225,.85);margin-top:4px}
+.achievement-overlay{position:fixed;top:12%;right:12px;z-index:42;display:none;pointer-events:none}.achievement-overlay.active{display:block}.achievement-card{background:rgba(65,50,12,.96);border:2px solid #ffd65c;border-radius:8px;padding:12px 18px;text-align:center}.achievement-icon{font-size:2rem}.achievement-name{font-weight:900;color:#ffd65c}.achievement-desc{font-size:.72rem;color:rgba(255,255,255,.7)}
+.touch-controls{position:fixed;bottom:0;left:0;right:0;display:none;grid-template-columns:repeat(6,1fr);gap:7px;padding:8px 8px 10px;z-index:25;pointer-events:auto;background:linear-gradient(transparent,rgba(0,0,0,.82) 18%)}
+.touch-btn{height:58px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.13);color:#fff;font-size:.7rem;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.touch-btn:active{background:rgba(255,255,255,.32);transform:scale(1.04)}.touch-icon{font-size:1.25rem;line-height:1}.touch-btn.accel{border-color:rgba(92,255,145,.55);color:#5cff91}.touch-btn.brake{border-color:rgba(255,123,92,.58);color:#ff7b5c}.touch-btn.emergency{border-color:rgba(255,70,70,.7);color:#ff5555}
+.result-rank{font-family:'Orbitron',sans-serif;font-size:4.5rem;font-weight:900;margin:8px 0;text-shadow:0 0 25px currentColor}.rank-S{color:#ffd700}.rank-A{color:#ff6b9d}.rank-B{color:#88ccff}.rank-C{color:#88ff88}.rank-D{color:#aaa}
+.result-details{background:rgba(0,0,0,.36);border-radius:8px;padding:14px;margin-bottom:14px;text-align:left;max-height:260px;overflow-y:auto}.result-row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.84rem}.result-row:last-child{border-bottom:0}.result-label{color:rgba(255,255,255,.68)}.result-value{font-family:'Orbitron',sans-serif;font-weight:800;color:#8fdcff;font-size:.8rem}.result-form{display:none}
+@media (pointer:coarse),(max-width:900px){.touch-controls{display:grid}.hud{bottom:80px;padding:4px 6px}.speedometer{width:126px;height:126px}.speed-number{font-size:1.55rem}.hud-panel{padding:4px 6px}.lever-bar-container{height:38px}.station-name{font-size:.9rem}.passenger-view{width:280px;top:4px;right:4px}.passenger-view:not(.minimized){height:30px}.passenger-view:not(.minimized) #passenger-canvas{display:none}.tutorial-grid{grid-template-columns:repeat(2,1fr)}.title-content{text-align:center}.title-menu{justify-content:center}.hud{align-items:flex-end}.hud-left,.hud-right{max-width:34vw}.hud-label{font-size:.55rem}.touch-btn{height:60px}.guide-overlay{top:6px}}
+@media (max-width:520px){.menu-btn{width:100%;min-width:0}.option-row{display:grid;grid-template-columns:repeat(2,1fr)}.touch-controls{grid-template-columns:repeat(3,1fr);padding-bottom:8px}.hud{bottom:142px}.hud-center{order:3}.speedometer{width:104px;height:104px}.speed-number{font-size:1.25rem}.passenger-view{display:none}.title-menu{display:grid;grid-template-columns:1fr;width:100%}}
 </style>
 </head>
 <body>
-
-<!-- タイトル -->
 <div id="title-screen" class="screen active">
     <div class="title-content">
-        <h1><span class="title-sub">Train Simulator</span><span class="title-main">さくら線</span><span class="title-edition">運転シミュレーター v3</span></h1>
+        <h1><span class="title-sub">TRAIN DRIVER</span><span class="title-main">さくらライン</span><span class="title-edition">運転シミュレーター</span></h1>
         <div class="title-menu">
-            <button id="btn-start" class="menu-btn">🚆 運転開始</button>
-            <button id="btn-tutorial" class="menu-btn">📖 操作説明</button>
-            <button id="btn-ranking" class="menu-btn">🏆 ランキング</button>
+            <button id="btn-start" class="menu-btn">運転をはじめる</button>
+            <button id="btn-tutorial" class="menu-btn">操作説明</button>
         </div>
-        <div class="title-info"><p>3路線 | 天候変化 | 踏切・猫・VIP・SNS・トンネル | 最高300km/h</p></div>
+        <div class="title-info"><p>停車位置、時刻、速度制限を守って終点を目指すブラウザ運転ゲームです。ランキング機能は削除し、端末内だけで気軽に遊べる構成にしました。</p></div>
     </div>
 </div>
 
-<!-- 路線・天候・時間帯選択 -->
 <div id="select-screen" class="screen">
     <div class="select-content">
-        <h2>🛤️ 路線・条件選択</h2>
-        <div class="section-label">🚆 路線を選択</div>
+        <h2>路線と条件を選択</h2>
+        <div class="section-label">路線</div>
         <div id="route-cards" class="route-cards"></div>
-        <div class="section-label">🌤️ 天候</div>
+        <div class="section-label">天気</div>
         <div class="option-row">
-            <button class="weather-btn selected" data-weather="clear">☀️ 晴れ</button>
-            <button class="weather-btn" data-weather="cloudy">☁️ 曇り</button>
-            <button class="weather-btn" data-weather="rain">🌧️ 雨</button>
-            <button class="weather-btn" data-weather="heavyRain">⛈️ 大雨</button>
-            <button class="weather-btn" data-weather="fog">🌫️ 霧</button>
-            <button class="weather-btn" data-weather="snow">❄️ 雪</button>
+            <button class="weather-btn selected" data-weather="clear">晴れ</button>
+            <button class="weather-btn" data-weather="cloudy">くもり</button>
+            <button class="weather-btn" data-weather="rain">雨</button>
+            <button class="weather-btn" data-weather="heavyRain">大雨</button>
+            <button class="weather-btn" data-weather="fog">霧</button>
+            <button class="weather-btn" data-weather="snow">雪</button>
         </div>
-        <div class="section-label">🕐 時間帯</div>
+        <div class="section-label">時間帯</div>
         <div class="option-row">
-            <button class="tod-btn" data-tod="morning">🌅 朝</button>
-            <button class="tod-btn selected" data-tod="day">☀️ 昼</button>
-            <button class="tod-btn" data-tod="evening">🌇 夕方</button>
-            <button class="tod-btn" data-tod="night">🌙 夜</button>
+            <button class="tod-btn" data-tod="morning">朝</button>
+            <button class="tod-btn selected" data-tod="day">昼</button>
+            <button class="tod-btn" data-tod="evening">夕方</button>
+            <button class="tod-btn" data-tod="night">夜</button>
         </div>
         <div class="select-buttons">
-            <button id="btn-select-back" class="menu-btn">🔙 戻る</button>
-            <button id="btn-go" class="menu-btn" style="background:rgba(68,170,255,0.3);border-color:#44aaff">🚀 出発！</button>
+            <button id="btn-select-back" class="menu-btn">タイトルに戻る</button>
+            <button id="btn-go" class="menu-btn">出発</button>
         </div>
     </div>
 </div>
 
-<!-- チュートリアル -->
 <div id="tutorial-screen" class="screen">
     <div class="tutorial-content">
-        <h2>📖 操作説明</h2>
+        <h2>操作説明</h2>
         <div class="tutorial-grid">
-            <div class="tutorial-card"><div class="key-icon">↑/W</div><div class="key-desc">マスコン<br>P1→P5</div></div>
-            <div class="tutorial-card"><div class="key-icon">↓/S</div><div class="key-desc">ブレーキ<br>B1→B8→非常</div></div>
-            <div class="tutorial-card"><div class="key-icon">←/A</div><div class="key-desc">1段戻す</div></div>
-            <div class="tutorial-card"><div class="key-icon">→/D</div><div class="key-desc">1段進める</div></div>
+            <div class="tutorial-card"><div class="key-icon">↑ / W</div><div class="key-desc">マスコンを上げる<br>P1からP5</div></div>
+            <div class="tutorial-card"><div class="key-icon">↓ / S</div><div class="key-desc">ブレーキを強める<br>B1から非常</div></div>
+            <div class="tutorial-card"><div class="key-icon">← / A</div><div class="key-desc">ノッチを下げる</div></div>
+            <div class="tutorial-card"><div class="key-icon">→ / D</div><div class="key-desc">ノッチを上げる</div></div>
             <div class="tutorial-card"><div class="key-icon">N</div><div class="key-desc">ニュートラル</div></div>
             <div class="tutorial-card"><div class="key-icon">Space</div><div class="key-desc">警笛</div></div>
             <div class="tutorial-card"><div class="key-icon">Enter</div><div class="key-desc">ドア開閉</div></div>
             <div class="tutorial-card"><div class="key-icon">E</div><div class="key-desc">非常ブレーキ</div></div>
         </div>
         <div class="tutorial-tips">
-            <h3>🎯 高得点のコツ</h3>
+            <h3>運転のコツ</h3>
             <ul>
-                <li>停車マーク（▼）にピッタリ停めよう（±1m以内で高得点！）</li>
-                <li>定刻通りに到着しよう（±5秒以内で高得点！）</li>
-                <li>制限速度・カーブ制限を守ろう</li>
-                <li>天候で制動力が変化！雨・雪ではブレーキ早めに</li>
-                <li>🐱 線路の猫は警笛(Space)で退かそう！</li>
-                <li>🚧 踏切は減速して安全通過！</li>
-                <li>⚡ スピードチャレンジ区間で高速通過ボーナス！</li>
-                <li>🔥 連続PERFECT停車でコンボボーナス！</li>
-                <li>🏆 隠し実績を全てアンロックしよう！</li>
+                <li>停止位置の手前から早めにブレーキを入れると安定します。</li>
+                <li>速度制限とカーブでは減速してください。超過すると減点されます。</li>
+                <li>雨や雪ではブレーキが効きにくくなるため、余裕を持って操作します。</li>
+                <li>スマホでは画面下の大きなボタンで加速、制動、ドア操作ができます。</li>
             </ul>
         </div>
-        <div class="tutorial-tips">
-            <h3>📱 モバイル操作</h3>
-            <ul><li>画面下部のボタンでマスコン・ブレーキ操作</li><li>加速/ブレーキボタンを連打して段数を上げよう</li></ul>
-        </div>
-        <button id="btn-tutorial-back" class="menu-btn">🔙 タイトルに戻る</button>
+        <button id="btn-tutorial-back" class="menu-btn">タイトルに戻る</button>
     </div>
 </div>
 
-<!-- ランキング -->
-<div id="ranking-screen" class="screen">
-    <div class="ranking-content">
-        <h2>🏆 ランキング</h2>
-        <div id="ranking-list" class="ranking-list"><p class="loading">読み込み中...</p></div>
-        <button id="btn-ranking-back" class="menu-btn">🔙 タイトルに戻る</button>
-    </div>
-</div>
-
-<!-- ゲーム -->
 <div id="game-screen" class="screen">
     <canvas id="game-canvas"></canvas>
-    <!-- 乗客ビュー（小窓） -->
     <div id="passenger-view" class="passenger-view">
-        <div class="pv-header"><span class="pv-title">🧑‍🤝‍🧑 車内カメラ</span><button id="pv-toggle" class="pv-toggle">−</button></div>
+        <div class="pv-header"><span class="pv-title">車内カメラ</span><button id="pv-toggle" class="pv-toggle">-</button></div>
         <canvas id="passenger-canvas"></canvas>
     </div>
     <div class="guide-overlay"><div id="guide-message" class="guide-message"></div></div>
@@ -291,22 +159,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
         <div class="hud-left">
             <div class="hud-panel">
                 <div class="hud-label">次の駅</div>
-                <div id="hud-next-station" class="hud-value station-name">—</div>
-                <div class="hud-row"><span class="hud-label">残り</span><span id="hud-distance" class="hud-value distance">—</span></div>
-                <div class="hud-row"><span class="hud-label">到着予定</span><span id="hud-arrival" class="hud-value time">—</span></div>
+                <div id="hud-next-station" class="hud-value station-name">--</div>
+                <div class="hud-row"><span class="hud-label">残り</span><span id="hud-distance" class="hud-value distance">--</span></div>
+                <div class="hud-row"><span class="hud-label">到着予定</span><span id="hud-arrival" class="hud-value time">--</span></div>
             </div>
             <div class="hud-panel">
-                <div class="hud-row"><span class="hud-label">時刻</span><span id="hud-time" class="hud-value time">—</span></div>
+                <div class="hud-row"><span class="hud-label">時刻</span><span id="hud-time" class="hud-value time">--</span></div>
                 <div class="hud-row"><span id="hud-delay-label" class="hud-label on-time">定刻</span><span id="hud-delay" class="hud-value">±0秒</span></div>
             </div>
             <div class="hud-panel">
-                <div class="hud-row"><span class="hud-label">勾配</span><span id="hud-grade" class="hud-value track-info">— 平坦</span></div>
+                <div class="hud-row"><span class="hud-label">勾配</span><span id="hud-grade" class="hud-value track-info">平坦</span></div>
                 <div class="hud-row"><span class="hud-label">カーブ</span><span id="hud-curve" class="hud-value track-info">直線</span></div>
             </div>
         </div>
         <div class="hud-center">
             <div class="speedometer"><canvas id="speed-canvas" width="180" height="180"></canvas><div class="speed-digital"><span id="hud-speed" class="speed-number">0</span><span class="speed-unit">km/h</span></div></div>
-            <div class="speed-limit-display"><span class="limit-label">制限速度</span><span id="hud-speed-limit" class="limit-value">—</span></div>
+            <div class="speed-limit-display"><span class="limit-label">制限速度</span><span id="hud-speed-limit" class="limit-value">--</span></div>
         </div>
         <div class="hud-right">
             <div class="hud-panel">
@@ -318,72 +186,47 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
             <div class="hud-panel"><div class="hud-row"><span class="hud-label">スコア</span><span id="hud-score" class="hud-value score">0</span></div></div>
         </div>
     </div>
-
-    <!-- モバイルタッチ操作 -->
     <div class="touch-controls" id="touch-controls">
         <button class="touch-btn accel" id="touch-accel"><span class="touch-icon">▲</span>加速</button>
         <button class="touch-btn" id="touch-neutral"><span class="touch-icon">●</span>N</button>
         <button class="touch-btn brake" id="touch-brake"><span class="touch-icon">▼</span>制動</button>
-        <button class="touch-btn" id="touch-horn"><span class="touch-icon">📯</span>警笛</button>
-        <button class="touch-btn" id="touch-door"><span class="touch-icon">🚪</span>ドア</button>
-        <button class="touch-btn emergency" id="touch-emergency"><span class="touch-icon">⚠</span>非常</button>
+        <button class="touch-btn" id="touch-horn"><span class="touch-icon">♪</span>警笛</button>
+        <button class="touch-btn" id="touch-door"><span class="touch-icon">▣</span>ドア</button>
+        <button class="touch-btn emergency" id="touch-emergency"><span class="touch-icon">!</span>非常</button>
     </div>
-
-    <!-- 車掌評価オーバーレイ -->
     <div id="conductor-overlay" class="conductor-overlay">
         <div class="conductor-card">
-            <span class="conductor-avatar" id="conductor-avatar">🧑‍✈️</span>
-            <div class="conductor-name">車掌 山田</div>
-            <div class="conductor-speech">
-                <div class="conductor-msg" id="conductor-msg">素晴らしい停車です！</div>
-                <div class="conductor-detail" id="conductor-detail"></div>
-            </div>
+            <span class="conductor-avatar" id="conductor-avatar">車掌</span>
+            <div class="conductor-name">車掌からの評価</div>
+            <div class="conductor-speech"><div class="conductor-msg" id="conductor-msg">よい停車です。</div><div class="conductor-detail" id="conductor-detail"></div></div>
             <div class="conductor-grade" id="conductor-grade" style="color:#ffd700">S</div>
-            <button class="conductor-btn" id="conductor-ok">了解 👍</button>
+            <button class="conductor-btn menu-btn" id="conductor-ok">了解</button>
         </div>
     </div>
-
-    <!-- クレーム通知 -->
-    <div id="claim-toast" class="claim-toast">
-        <span class="claim-icon">😡</span>
-        <div class="claim-text" id="claim-text">乗客からクレーム！</div>
-        <div class="claim-sub" id="claim-sub">急ブレーキにより転倒者が続出しています</div>
-    </div>
-
-    <!-- 実績ポップアップ -->
-    <div id="achievement-overlay" class="achievement-overlay">
-        <div class="achievement-card">
-            <div class="achievement-icon" id="ach-icon">🏆</div>
-            <div class="achievement-name" id="ach-name">実績解除！</div>
-            <div class="achievement-desc" id="ach-desc"></div>
-        </div>
-    </div>
+    <div id="claim-toast" class="claim-toast"><span class="claim-icon">!</span><div class="claim-text" id="claim-text">乗客から苦情</div><div class="claim-sub" id="claim-sub">急な操作に注意してください。</div></div>
+    <div id="achievement-overlay" class="achievement-overlay"><div class="achievement-card"><div class="achievement-icon" id="ach-icon">★</div><div class="achievement-name" id="ach-name">実績解除</div><div class="achievement-desc" id="ach-desc"></div></div></div>
 </div>
 
-<!-- リザルト -->
 <div id="result-screen" class="screen">
     <div class="result-content">
-        <h2>🎉 運転終了</h2>
+        <h2>運転終了</h2>
         <div id="result-rank" class="result-rank">S</div>
         <div id="result-details" class="result-details"></div>
-        <div class="result-form">
-            <input type="text" id="player-name" placeholder="名前を入力" maxlength="20">
-            <button id="btn-register" class="menu-btn">📝 ランキング登録</button>
-        </div>
+        <div class="result-form"><input type="text" id="player-name" placeholder="名前" maxlength="20"><button id="btn-register" class="menu-btn">登録</button></div>
         <div class="result-buttons">
-            <button id="btn-retry" class="menu-btn">🔄 もう一度</button>
-            <button id="btn-result-title" class="menu-btn">🔙 タイトルに戻る</button>
+            <button id="btn-retry" class="menu-btn">もう一度運転</button>
+            <button id="btn-result-title" class="menu-btn">タイトルに戻る</button>
         </div>
     </div>
 </div>
 
-<script src="js/audio.js"></script>
-<script src="js/config.js"></script>
-<script src="js/physics.js"></script>
-<script src="js/renderer.js"></script>
-<script src="js/passenger.js"></script>
-<script src="js/events.js"></script>
-<script src="js/game.js"></script>
-<script src="js/main.js"></script>
+<script src="audio.js"></script>
+<script src="renderer.js"></script>
+<script src="game.js"></script>
+<script src="events.js"></script>
+<script src="main.js"></script>
+<script src="physics.js"></script>
+<script src="passenger.js"></script>
+<script src="app-fixes.js"></script>
 </body>
 </html>
